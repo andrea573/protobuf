@@ -1130,13 +1130,14 @@ void FileGenerator::GenerateReflectionInitializationCode(io::Printer* p) {
              }},
         },
         R"cc(
-          const ::uint32_t $tablename$::offsets[] PROTOBUF_SECTION_VARIABLE(
-              protodesc_cold) = {
-              $offsets$,
+          const ::uint32_t
+              $tablename$::offsets[] ABSL_ATTRIBUTE_SECTION_VARIABLE(
+                  protodesc_cold) = {
+                  $offsets$,
           };
 
           static const ::_pbi::MigrationSchema
-              schemas[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
+              schemas[] ABSL_ATTRIBUTE_SECTION_VARIABLE(protodesc_cold) = {
                   $schemas$,
           };
 
@@ -1211,7 +1212,8 @@ void FileGenerator::GenerateReflectionInitializationCode(io::Printer* p) {
           }
         }}},
       R"cc(
-        const char $desc_name$[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
+        const char $desc_name$[] ABSL_ATTRIBUTE_SECTION_VARIABLE(
+            protodesc_cold) = {
             $encoded_file_proto$,
         };
       )cc");
@@ -1299,7 +1301,7 @@ void FileGenerator::GenerateReflectionInitializationCode(io::Printer* p) {
         //   vtables -> GetMetadata
         // By adding a weak function here we break the connection from the
         // individual vtables back into the descriptor table.
-        PROTOBUF_ATTRIBUTE_WEAK const ::_pbi::DescriptorTable* $desc_table$_getter() {
+        ABSL_ATTRIBUTE_WEAK const ::_pbi::DescriptorTable* $desc_table$_getter() {
           return &$desc_table$;
         }
       )cc");

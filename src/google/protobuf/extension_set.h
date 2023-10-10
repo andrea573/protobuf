@@ -1530,7 +1530,7 @@ class ExtensionIdentifier {
 
 
 // Used to retrieve a lazy extension, may return nullptr in some environments.
-extern PROTOBUF_ATTRIBUTE_WEAK ExtensionSet::LazyMessageExtension*
+extern ABSL_ATTRIBUTE_WEAK ExtensionSet::LazyMessageExtension*
 MaybeCreateLazyExtension(Arena* arena);
 
 // Define a specialization of ExtensionIdentifier for bootstrapped extensions
