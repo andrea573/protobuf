@@ -30,6 +30,8 @@ namespace internal {
 class TestZeroCopyInputStream final : public ZeroCopyInputStream {
  public:
   // The input stream will provide the buffers exactly as passed here.
+  explicit TestZeroCopyInputStream(std::initializer_list<std::string> buffers)
+      : buffers_(buffers.begin(), buffers.end()) {}
   explicit TestZeroCopyInputStream(const std::vector<std::string>& buffers)
       : buffers_(buffers.begin(), buffers.end()) {}
 
