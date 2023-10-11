@@ -14,9 +14,6 @@ namespace google {
 namespace protobuf {
 namespace compiler {
 
-// Returns whether a file can use the `import weak` syntax.
-bool IsWeakImportFile(absl::string_view file);
-
 // Returns whether a file can have an empty package.
 bool IsEmptyPackageFile(absl::string_view file);
 
@@ -31,6 +28,10 @@ bool IsUnusedImportFile(absl::string_view file);
 
 // Returns whether a file has early access to editions.
 bool IsEarlyEditionsFile(absl::string_view file);
+
+#ifndef PROTO2_OPENSOURCE
+bool IsAllowlisted(absl::string_view allowlist, absl::string_view file);
+#endif
 
 }  // namespace compiler
 }  // namespace protobuf

@@ -7,7 +7,10 @@
 
 #include "google/protobuf/compiler/allowlists/allowlist.h"
 
+#include <string>
+
 #include <gtest/gtest.h>
+#include "google/protobuf/compiler/allowlists/allowlists.h"
 
 namespace google {
 namespace protobuf {
