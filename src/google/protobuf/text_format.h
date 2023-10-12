@@ -722,8 +722,8 @@ class PROTOBUF_EXPORT TextFormat {
     // If called, the parser will report an error if a parsed field had no
     // effect on the resulting proto (for example, fields with no presence that
     // were set to their default value).
-    void ErrorOnNoOpFields(bool return_error) {
-      error_on_no_op_fields_ = return_error;
+    void OutputNoOpFields(std::vector<const void*>* no_op_fields) {
+      no_op_fields_ = no_op_fields;
     }
 
    private:
@@ -748,7 +748,7 @@ class PROTOBUF_EXPORT TextFormat {
     bool allow_relaxed_whitespace_;
     bool allow_singular_overwrites_;
     int recursion_limit_;
-    bool error_on_no_op_fields_ = false;
+    std::vector<const void*>* no_op_fields_{};
   };
 
 

@@ -18,4 +18,5 @@ message TestNoPresenceField {
   bool no_presence_bool = 1;
   TestNoPresenceField no_presence_nested = 2;
   repeated TestNoPresenceField no_presence_repeated_nested = 3;
+  string no_presence_string = 4;
 }

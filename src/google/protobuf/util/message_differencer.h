@@ -581,6 +581,11 @@ class PROTOBUF_EXPORT MessageDifferencer {
   // in the comparison.
   void set_force_compare_no_presence(bool value);
 
+  void set_require_no_presence_addresses(
+      const std::vector<const void*>& addresses) {
+    require_no_presence_addresses_.insert(addresses.begin(), addresses.end());
+  }
+
   // DEPRECATED. Pass a DefaultFieldComparator instance instead.
   // Sets the type of comparison (as defined in the FloatComparison enumeration
   // above) that is used by this differencer when comparing float (and double)
@@ -768,6 +773,7 @@ class PROTOBUF_EXPORT MessageDifferencer {
   // list.  Fields only present in one of the lists will only appear in the
   // combined list if the corresponding fields_scope option is set to FULL.
   std::vector<const FieldDescriptor*> CombineFields(
+      const Message& message1,
       const std::vector<const FieldDescriptor*>& fields1, Scope fields1_scope,
       const std::vector<const FieldDescriptor*>& fields2, Scope fields2_scope);
 
@@ -919,11 +925,16 @@ class PROTOBUF_EXPORT MessageDifferencer {
       const FieldDescriptor* field,
       const RepeatedFieldComparison& new_comparison);
 
+  bool ShouldCompareNoPresence(const Message& message1,
+                               const Reflection& reflection1,
+                               const FieldDescriptor* field2) const;
+
   Reporter* reporter_;
   DefaultFieldComparator default_field_comparator_;
   MessageFieldComparison message_field_comparison_;
   Scope scope_;
   absl::flat_hash_set<const FieldDescriptor*> force_compare_no_presence_fields_;
+  absl::flat_hash_set<const void*> require_no_presence_addresses_;
   absl::flat_hash_set<std::string> force_compare_failure_triggering_fields_;
   RepeatedFieldComparison repeated_field_comparison_;
 

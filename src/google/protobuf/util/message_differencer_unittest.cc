@@ -29,8 +29,10 @@
 #include "absl/strings/str_split.h"
 #include "absl/strings/string_view.h"
 #include "google/protobuf/any_test.pb.h"
+#include "google/protobuf/descriptor.h"
 #include "google/protobuf/map_test_util.h"
 #include "google/protobuf/map_unittest.pb.h"
+#include "google/protobuf/message.h"
 #include "google/protobuf/test_util.h"
 #include "google/protobuf/text_format.h"
 #include "google/protobuf/unittest.pb.h"
@@ -43,13 +45,26 @@
 
 namespace google {
 namespace protobuf {
+namespace address_getter_unittest_util {
+class AddressGetter {
+ public:
+  static const void* GetAddress(const Message& message,
+                                const Reflection& reflection,
+                                const FieldDescriptor& fd) {
+    return &reflection.GetRaw<char>(message, &fd);
+  }
+};
+}  // namespace address_getter_unittest_util
 
 namespace {
+
+using address_getter_unittest_util::AddressGetter;
 
 
 proto3_unittest::TestNoPresenceField MakeTestNoPresenceField() {
   proto3_unittest::TestNoPresenceField msg1, msg2;
   msg1.set_no_presence_bool(true);
+  msg1.set_no_presence_string("yolo");
   msg2 = msg1;
   *msg1.mutable_no_presence_nested() = msg2;
   *msg1.add_no_presence_repeated_nested() = msg2;
@@ -376,6 +391,84 @@ TEST(MessageDifferencerTest,
   EXPECT_TRUE(
       force_compare_differencer.NoPresenceFieldsCausingFailure().empty());
   EXPECT_FALSE(default_differencer.Compare(msg2, msg1));
+}
+
+TEST(MessageDifferencerTest,
+     PartialEqualityTestBooleanPresenceFieldMissingWithAddress) {
+  util::MessageDifferencer address_differencer;
+  address_differencer.set_scope(util::MessageDifferencer::PARTIAL);
+
+  // This differencer is not setting force_compare_no_presence.
+  util::MessageDifferencer default_differencer;
+  default_differencer.set_scope(util::MessageDifferencer::PARTIAL);
+  default_differencer.set_force_compare_no_presence(false);
+
+  // When clearing a singular no presence field, it will be included in the
+  // comparison.
+  proto3_unittest::TestNoPresenceField msg1 = MakeTestNoPresenceField();
+  proto3_unittest::TestNoPresenceField msg2 = MakeTestNoPresenceField();
+
+  const Reflection* reflection1 = msg1.GetReflection();
+  const FieldDescriptor* fd1 = msg1.GetDescriptor()->FindFieldByNumber(1);
+  address_differencer.set_require_no_presence_addresses(
+      {AddressGetter::GetAddress(msg1, *reflection1, *fd1)});
+
+  EXPECT_TRUE(address_differencer.Compare(msg1, msg2));
+  EXPECT_TRUE(default_differencer.Compare(msg1, msg2));
+
+  msg1.clear_no_presence_bool();
+
+  EXPECT_FALSE(address_differencer.Compare(msg1, msg2));
+  EXPECT_TRUE(default_differencer.Compare(msg1, msg2));
+
+  msg2.clear_no_presence_bool();
+
+  EXPECT_TRUE(address_differencer.Compare(msg1, msg2));
+  EXPECT_TRUE(default_differencer.Compare(msg1, msg2));
+
+  msg1.set_no_presence_bool(true);
+
+  EXPECT_FALSE(default_differencer.Compare(msg1, msg2));
+  EXPECT_FALSE(address_differencer.Compare(msg1, msg2));
+}
+
+TEST(MessageDifferencerTest,
+     PartialEqualityTestStringPresenceFieldMissingWithAddress) {
+  util::MessageDifferencer address_differencer;
+  address_differencer.set_scope(util::MessageDifferencer::PARTIAL);
+
+  // This differencer is not setting force_compare_no_presence.
+  util::MessageDifferencer default_differencer;
+  default_differencer.set_scope(util::MessageDifferencer::PARTIAL);
+  default_differencer.set_force_compare_no_presence(false);
+
+  // When clearing a singular no presence field, it will be included in the
+  // comparison.
+  proto3_unittest::TestNoPresenceField msg1 = MakeTestNoPresenceField();
+  proto3_unittest::TestNoPresenceField msg2 = MakeTestNoPresenceField();
+
+  const Reflection* reflection1 = msg1.GetReflection();
+  const FieldDescriptor* fd1 = msg1.GetDescriptor()->FindFieldByNumber(4);
+  address_differencer.set_require_no_presence_addresses(
+      {AddressGetter::GetAddress(msg1, *reflection1, *fd1)});
+
+  EXPECT_TRUE(address_differencer.Compare(msg1, msg2));
+  EXPECT_TRUE(default_differencer.Compare(msg1, msg2));
+
+  msg1.clear_no_presence_string();
+
+  EXPECT_FALSE(address_differencer.Compare(msg1, msg2));
+  EXPECT_TRUE(default_differencer.Compare(msg1, msg2));
+
+  msg2.clear_no_presence_string();
+
+  EXPECT_TRUE(address_differencer.Compare(msg1, msg2));
+  EXPECT_TRUE(default_differencer.Compare(msg1, msg2));
+
+  msg1.set_no_presence_string("yolo");
+
+  EXPECT_FALSE(default_differencer.Compare(msg1, msg2));
+  EXPECT_FALSE(address_differencer.Compare(msg1, msg2));
 }
 
 TEST(MessageDifferencerTest,

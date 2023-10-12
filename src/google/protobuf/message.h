@@ -135,6 +135,10 @@ class MapValueConstRef;
 class MapValueRef;
 class MapIterator;
 class MapReflectionTester;
+class TextFormat;
+namespace address_getter_unittest_util {
+class AddressGetter;
+}  // namespace address_getter_unittest_util
 
 namespace internal {
 struct FuzzPeer;
@@ -1007,6 +1011,8 @@ class PROTOBUF_EXPORT Reflection final {
     return schema_.IsSplit(field);
   }
 
+  friend class google::protobuf::TextFormat;
+  friend class address_getter_unittest_util::AddressGetter;
   friend class FastReflectionBase;
   friend class FastReflectionMessageMutator;
   friend bool internal::IsDescendant(Message& root, const Message& message);
