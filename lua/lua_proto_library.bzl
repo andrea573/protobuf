@@ -7,17 +7,15 @@
 
 """lua_proto_library(): a rule for building Lua protos."""
 
-load("@bazel_skylib//lib:paths.bzl", "paths")
+load("@bazel_lib//lib:paths.bzl", "paths")
 
 # Generic support code #########################################################
 
-# begin:github_only
-_is_google3 = False
-# end:github_only
+
 
 # begin:google_only
-# _is_google3 = True
-# end:google_only
+# _is_google3 = false
+# end:google3
 
 def _get_real_short_path(file):
     # For some reason, files from other archives have short paths that look like:
